@@ -432,6 +432,136 @@
   @media (max-width: 400px) {
     .trouble-grid { grid-template-columns: 1fr; }
   }
+
+  /* メールモーダル */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(13,61,82,0.45);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-overlay.open {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .modal-box {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 16px 48px rgba(13,61,82,0.22);
+    position: relative;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal-close {
+    position: absolute;
+    top: 14px; right: 16px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--subtext);
+    line-height: 1;
+  }
+  .modal-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .mail-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1.5px solid #d0eaf5;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    background: var(--white);
+  }
+  .mail-option:hover {
+    border-color: var(--accent);
+    background: var(--bg);
+  }
+  .mail-option-icon {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .icon-blue { background: #e0f2fc; }
+  .icon-red  { background: #fde8e8; }
+  .mail-option-text strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .mail-option-text span {
+    font-size: 12px;
+    color: var(--subtext);
+  }
+  .modal-divider {
+    font-size: 12px;
+    color: var(--subtext);
+    font-weight: 700;
+    margin: 16px 0 10px;
+  }
+  .copy-box {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.8;
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+    max-height: 120px;
+    overflow-y: auto;
+    border: 1px solid #c9e8f5;
+  }
+  .btn-copy {
+    display: block;
+    width: 100%;
+    background: #e8f5fb;
+    color: var(--main);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--accent);
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-copy:hover { background: #d0eaf5; }
+  .copy-note {
+    font-size: 11px;
+    color: var(--subtext);
+    text-align: center;
+    margin-top: 8px;
+    line-height: 1.6;
+  }
 </style>
 </head>
 <body>
@@ -510,11 +640,47 @@
 
     <div class="cta-area">
       <a href="tel:042-975-1000" class="btn-main">📞 今すぐ電話で相談する　042-975-1000</a>
-      <a href="mailto:honma@kodamaya.info" class="btn-sub">📩 メールでお問い合わせ</a>
+      <button class="btn-sub" onclick="openMailModal()">📩 メールでお問い合わせ</button>
       <a href="#" class="btn-sub" style="border-color:#06C755;color:#06C755;">💬 LINEで気軽に相談</a>
       <button class="btn-reset" onclick="resetAll()">← 最初からやり直す</button>
     </div>
 
+  </div>
+</div>
+
+<!-- メールモーダル -->
+<div class="modal-overlay" id="mailModal" onclick="closeMailModalOutside(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeMailModal()">✕</button>
+    <div class="modal-title">メールでお問い合わせ</div>
+
+    <a href="mailto:honma@kodamaya.info?subject=法律相談のお問い合わせ&body=お名前：%0Aご連絡先：%0Aご相談内容：%0A" class="mail-option">
+      <div class="mail-option-icon icon-blue">✉️</div>
+      <div class="mail-option-text">
+        <strong>メールソフトで送る</strong>
+        <span>Outlook、Macメールなど設定済みの方</span>
+      </div>
+    </a>
+
+    <a href="https://mail.google.com/mail/?view=cm&to=honma@kodamaya.info&su=法律相談のお問い合わせ&body=お名前：%0Aご連絡先：%0Aご相談内容：%0A" target="_blank" class="mail-option">
+      <div class="mail-option-icon icon-red">📮</div>
+      <div class="mail-option-text">
+        <strong>Gmailで送る</strong>
+        <span>ブラウザでGmailをお使いの方</span>
+      </div>
+    </a>
+
+    <div class="modal-divider">うまくいかない場合は...</div>
+    <div class="copy-box" id="copyText">以下の内容をコピーして、お使いのメールに貼り付けて honma@kodamaya.info までお送りください。
+
+【法律相談ナビからのお問い合わせ】
+
+■お名前：
+■ご連絡先（電話またはメール）：
+■ご相談内容：
+</div>
+    <button class="btn-copy" onclick="copyMailText()">📋 本文をコピーする</button>
+    <div class="copy-note" id="copy-note">コピーしたら、メールアプリを開いて貼り付けてください</div>
   </div>
 </div>
 
@@ -616,6 +782,29 @@ function resetAll() {
   document.getElementById('diagnose-btn').classList.remove('active');
   document.querySelectorAll('.trouble-card').forEach(c => c.classList.remove('selected'));
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function openMailModal() {
+  document.getElementById('mailModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMailModal() {
+  document.getElementById('mailModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeMailModalOutside(e) {
+  if (e.target === document.getElementById('mailModal')) closeMailModal();
+}
+function copyMailText() {
+  const text = document.getElementById('copyText').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const note = document.getElementById('copy-note');
+    note.textContent = '✅ コピーしました！メールアプリに貼り付けてください';
+    note.style.color = 'var(--main)';
+    setTimeout(() => {
+      note.textContent = 'コピーしたら、メールアプリを開いて貼り付けてください';
+      note.style.color = '';
+    }, 3000);
+  });
 }
 </script>
 </body>
